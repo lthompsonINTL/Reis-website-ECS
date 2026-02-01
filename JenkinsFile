@@ -1,0 +1,33 @@
+// THe Jenkins file will setup the build process for creating a Docker Image. Code is pulled from a GitHub repository and then a Docker Image is created. This Jenkins file is specific for Reis Website
+
+pipeline {
+    agent any
+    tools{
+     jdk 'OpenJDK8'   
+        
+    }
+
+    stages {
+        stage('Source Control Management') {  // Pulls code from Jenkins branch
+            steps {
+               git branch: 'main', changelog: false, poll: false, url: 'https://github.com/lthompsonINTL/Reis-website/'
+            }
+        }
+    
+   
+ stage ('Build Docker Image & Push') { // Logs into Docker, builds a docker image from the GitHub Repository and pushes the build to Docker
+      steps {
+        script {
+                withDockerRegistry(credentialsId:'dockerlogin') {
+                    sh "docker build -t lthompsonintl/jenkins-cicd-pipeline:latest ."
+                    sh "docker push lthompsonintl/jenkins-cicd-pipeline:latest"
+                }
+            }
+        
+      }
+    }
+
+
+    
+}
+}
